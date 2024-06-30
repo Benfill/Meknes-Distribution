@@ -11,9 +11,9 @@ const columns = [
   { accessorKey: 'email', header: 'Email' },
   { accessorKey: 'phone', header: 'Tel' },
   { accessorKey: 'raison_sociale', header: 'Raison Sociale' },
-  { accessorKey: 'CIN_ICE', header: 'CIN ou ICE' },
   { accessorKey: 'type', header: 'Type Du Client' },
-  { accessorKey: 'role', header: 'Role Du Client' },
+  { accessorKey: 'CIN_ICE', header: 'CIN/ICE' },
+  { accessorKey: 'role', header: 'Role Du Client', selectOptions: ["CEO", "Farm Manager", "Agronomist", "Supply Chain Manager", "Field Technician", "Sales Representative", "Marketing Director", "Research Scientist", "Quality Control Specialist", "HR Manager", "Other"]},
   { accessorKey: 'address_exploitation', header: "Address D'exploitation" },
   { accessorKey: 'address_facturation', header: 'Address De Facturation' },
 ];
