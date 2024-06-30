@@ -1,4 +1,17 @@
+- Db:
 php artisan migrate:fresh
 php artisan db:seed
 php artisan passport:client --personal
+
+
+- Install the Packages:
 composer require barryvdh/laravel-dompdf
+
+
+- Regenerate Autoload Files:
+Regenerate Autoload Files
+
+
+- Clear Laravel Cache:
+php artisan config:cache
+php artisan config:clear
