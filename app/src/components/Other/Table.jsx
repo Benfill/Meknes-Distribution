@@ -15,6 +15,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Input,
 } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,9 +31,7 @@ import ConfirmAlert from '../Alerts/ConfirmAlert';
 import { Spinner } from 'flowbite-react';
 import SubSelect from '../Client-File/SubSelect';
 
-
-
-const Table = ({ columns, data, entityType, validateEntity, updatedData }) => {
+const Table = ({ columns, data, entityType, validateEntity, updatedData, suppliers = [] }) => {
   const [validationErrors, setValidationErrors] = useState({});
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [currentRow, setCurrentRow] = useState(null);
@@ -69,20 +68,56 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData }) => {
             <MenuItem key="Entreprise" value="Entreprise">Entreprise</MenuItem>,
           ],
         };
+      } else if (col.accessorKey === 'role') {
+        muiEditTextFieldProps = {
+          select: true,
+          SelectProps: {
+            displayEmpty: true,
+            renderValue: (value) => (value ? value : 'Select Role'),
+          },
+          children: col.selectOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          )),
+        };
+      } else if (col.accessorKey === 'supplier_id') {
+        muiEditTextFieldProps = {
+          select: true,
+          SelectProps: {
+            displayEmpty: true,
+            renderValue: (value) => (value ? value.name : 'Select Supplier'),
+          },
+          children: suppliers.map((supplier) => (
+            <MenuItem key={supplier.id} value={supplier.id}>
+              {supplier.name}
+            </MenuItem>
+          )),
+        };
       } else if (col.accessorKey === 'sub_category_id') {
         muiEditTextFieldProps = {
           children: <SubSelect />,
         };
-      }
+      } else if (col.accessorKey === 'image') {
+        muiEditTextFieldProps = {
+          children: (
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, table)}
+            />
+          ),
+        };
+      
+      } 
   
       return {
         ...col,
         muiEditTextFieldProps,
       };
     });
-  }, [columns, validationErrors]);
+  }, [columns, validationErrors, suppliers]);
   
-
   const queryKey = `${entityType.toLowerCase()}s`;
 
   const createEntity = useMutation({
@@ -113,22 +148,14 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData }) => {
   });
 
   const handleCreateEntity = async ({ values, table }) => {
-    const newValidationErrors = validateEntity(values);
-    if (Object.values(newValidationErrors).some(Boolean)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
     await createEntity.mutateAsync(values);
     table.setCreatingRow(null);
   };
 
   const handleSaveEntity = async ({ values, table }) => {
-    const newValidationErrors = validateEntity(values);
-    if (Object.values(newValidationErrors).some(Boolean)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
+    console.log('update click');
     await updateEntity.mutateAsync(values);
+    console.log('update after request');
     table.setEditingRow(null);
   };
 
@@ -167,15 +194,6 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData }) => {
         <DialogTitle>Create New {entityType}</DialogTitle>
         <DialogContent>
           {internalEditComponents}
-          {entityType === 'User' && (
-            <TextField
-              label="Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              onChange={(e) => table.setValueForField('password', e.target.value)}
-            />
-          )}
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
