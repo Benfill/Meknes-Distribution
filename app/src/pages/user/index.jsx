@@ -10,6 +10,7 @@ const columns = [
   { accessorKey: "name", header: "Nom" },
   { accessorKey: "email", header: "Email" },
   { accessorKey: "roleName", header: "Role" },
+  { accessorKey: "password", header: "Password", hideInTable: true },
 ];
 
 export const User = () => {
