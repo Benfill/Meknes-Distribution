@@ -79,14 +79,14 @@
             <p><span class="label">Commune:</span> {{ $file->commune->name }}</p>
             <p><span class="label">Clients:</span>
                 @foreach ($file->clients as $client)
-                    {{ $client->name }}@if (!$loop->last)
+                    {{ $client->first_name . " " . $client->last_name }}@if (!$loop->last)
                         ,
                     @endif
                 @endforeach
             </p>
             <p><span class="label">Produits:</span>
                 @foreach ($file->products as $product)
-                    {{ $product->name }}@if (!$loop->last)
+                    {{ $product->designation }}@if (!$loop->last)
                         ,
                     @endif
                 @endforeach

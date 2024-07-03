@@ -22,6 +22,10 @@ class ClientFile extends Model implements HasMedia
         'is_deleted'
     ];
 
+    /**
+     * @throws \Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist
+     * @throws \Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig
+     */
     function makeInfosFile(): string
     {
         $pdf = Pdf::loadView('infosFile_template', ['file' => $this])

@@ -136,7 +136,7 @@ class ClientFileController extends Controller
             'file_name' => ['required', 'string', 'max:255',
                 Rule::unique('client_files')->ignore($id),],
             'commune_id' => 'required|numeric|exists:communes,id',
-            'more_detail' => 'sometimes|string',
+            'more_detail' => 'nullable|string',
             'exploitation_surface' => 'required|numeric',
         ]);
 
@@ -183,6 +183,7 @@ class ClientFileController extends Controller
             }
         }
 
+        $clientFile->makeInfosFile();
         // Clear cache and return response
         Cache::forget('client_files');
         Cache::forget('clients');
