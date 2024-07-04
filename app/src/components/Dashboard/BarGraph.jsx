@@ -1,122 +1,163 @@
-import * as React from 'react';
-import { BarChart } from '@mui/x-charts/BarChart';
-import { axisClasses } from '@mui/x-charts/ChartsAxis';
+import React, { useRef, useState, useEffect } from "react";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { axisClasses } from "@mui/x-charts/ChartsAxis";
+import GET from "../../utils/GET";
 
-const chartSetting = {
-  yAxis: [
-    {
-      label: 'rainfall (mm)',
-    },
-  ],
-  width: 500,
-  height: 300,
-  sx: {
-    [`.${axisClasses.left} .${axisClasses.label}`]: {
-      transform: 'translate(-20px, 0)',
-    },
-  },
-};
-const dataset = [
+const months = [
   {
-    london: 59,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
-    month: 'Jan',
+    nbr: 1,
+    month: "Jan",
   },
   {
-    london: 50,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
-    month: 'Fev',
+    nbr: 2,
+    month: "Fév",
   },
   {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
-    month: 'Mar',
+    nbr: 3,
+    month: "Mar",
   },
   {
-    london: 54,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
-    month: 'Apr',
+    nbr: 4,
+    month: "Avr",
   },
   {
-    london: 57,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
-    month: 'May',
+    nbr: 5,
+    month: "Mai",
   },
   {
-    london: 60,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
-    month: 'June',
+    nbr: 6,
+    month: "Juin",
   },
   {
-    london: 59,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
-    month: 'July',
+    nbr: 7,
+    month: "Juil",
   },
   {
-    london: 65,
-    paris: 60,
-    newYork: 106,
-    seoul: 249,
-    month: 'Aug',
+    nbr: 8,
+    month: "Aoû",
   },
   {
-    london: 51,
-    paris: 51,
-    newYork: 95,
-    seoul: 131,
-    month: 'Sept',
+    nbr: 9,
+    month: "Sep",
   },
   {
-    london: 60,
-    paris: 65,
-    newYork: 97,
-    seoul: 55,
-    month: 'Oct',
+    nbr: 10,
+    month: "Oct",
   },
   {
-    london: 67,
-    paris: 64,
-    newYork: 76,
-    seoul: 48,
-    month: 'Nov',
+    nbr: 11,
+    month: "Nov",
   },
   {
-    london: 61,
-    paris: 70,
-    newYork: 103,
-    seoul: 25,
-    month: 'Dec',
+    nbr: 12,
+    month: "Déc",
   },
 ];
 
-const valueFormatter = (value) => `${value}mm`;
+const valueFormatter = (value) =>
+  `${value} ${value > 1 ? "Produits" : "Produit"}`;
 
 export default function BarGraph() {
+  const [data, setData] = useState([]);
+  const chartContainerRef = useRef(null);
+  const [chartDimensions, setChartDimensions] = useState({
+    width: 700,
+    height: 500,
+  });
+
+  async function getTrending() {
+    try {
+      const response = await GET("stats/productsStats", true);
+      if (response && response.data && Array.isArray(response.data)) {
+        const DATA = response.data;
+
+        // Create an object to store product names
+        const productNames = DATA.reduce((acc, item) => {
+          acc[item.name] = true;
+          return acc;
+        }, {});
+
+        // Create the new data structure
+        const newData = months.map((m) => {
+          const monthData = {
+            month: m.month,
+          };
+
+          // Initialize all products with 0 for each month
+          Object.keys(productNames).forEach((name) => {
+            monthData[name] = 0;
+          });
+
+          // Update values for products that have data for this month
+          DATA.forEach((item) => {
+            if (item.created_month === m.nbr.toString()) {
+              monthData[item.name] = item.product_total;
+            }
+          });
+
+          return monthData;
+        });
+
+        setData(newData);
+      } else {
+        console.error("Unexpected response structure:", response);
+      }
+    } catch (e) {
+      console.error("Error fetching trending data:", e);
+    }
+  }
+
+  useEffect(() => {
+    getTrending();
+  }, []);
+
+  const chartSetting = {
+    yAxis: [
+      {
+        label: "Client files creation timeline",
+      },
+    ],
+    width: chartDimensions.width,
+    height: chartDimensions.height,
+    sx: {
+      [`.${axisClasses.left} .${axisClasses.label}`]: {
+        transform: "translate(-20px, 0)",
+      },
+    },
+  };
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (chartContainerRef.current) {
+        const { width } = chartContainerRef.current.getBoundingClientRect();
+        setChartDimensions({
+          width: width,
+          height: width * 0.6, // Maintain a 5:3 aspect ratio, adjust as needed
+        });
+      }
+    };
+
+    updateDimensions(); // Initial measurement
+    window.addEventListener("resize", updateDimensions);
+
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
   return (
-    <BarChart
-      dataset={dataset}
-      xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-      series={[
-        { dataKey: 'london', label: 'London', valueFormatter },
-        { dataKey: 'paris', label: 'Paris', valueFormatter },
-        { dataKey: 'newYork', label: 'New York', valueFormatter },
-        { dataKey: 'seoul', label: 'Seoul', valueFormatter },
-      ]}
-      {...chartSetting}
-    />
+    <div ref={chartContainerRef} style={{ width: "100%", height: "auto" }}>
+      <BarChart
+        dataset={data}
+        xAxis={[{ scaleType: "band", dataKey: "month" }]}
+        series={Object.keys(data[0] || {})
+          .filter((key) => key !== "month")
+          .map((productName) => ({
+            dataKey: productName,
+            label: productName.includes("(M)")
+              ? productName.replace("(M)", "")
+              : productName,
+            valueFormatter,
+          }))}
+        {...chartSetting}
+      />
+    </div>
   );
 }

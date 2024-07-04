@@ -111,4 +111,48 @@ class StatsController extends Controller
         return response()->json($response, 200);
     }
 
+    function getTrendingCommune(): \Illuminate\Http\JsonResponse
+    {
+        $trending = DB::select("
+            SELECT communes.id, communes.name, COUNT(client_files.id) AS nbr
+            FROM communes
+            INNER JOIN client_files ON communes.id = client_files.commune_id
+            GROUP BY communes.id
+             ORDER BY nbr DESC
+             LIMIT 4
+");
+
+        return response()->json([
+            'status' => 'success',
+            'trending' => $trending
+        ]);
+    }
+
+    function getProductsStats(): \Illuminate\Http\JsonResponse
+    {
+        $data = DB::select("
+                WITH ranked_data AS (
+                SELECT
+                    COUNT(products.id) AS product_total,
+                    communes.name,
+                    EXTRACT(MONTH FROM client_files.created_at) AS created_month,
+                    ROW_NUMBER() OVER (PARTITION BY EXTRACT(MONTH FROM client_files.created_at) ORDER BY COUNT(products.id) DESC) AS rank
+                FROM client_file_products
+                INNER JOIN products ON client_file_products.product_id = products.id
+                INNER JOIN client_files ON client_file_products.client_file_id = client_files.id
+                INNER JOIN communes ON client_files.commune_id = communes.id
+                WHERE client_files.created_at > (CURRENT_DATE - INTERVAL '12 months')
+                GROUP BY communes.name, EXTRACT(MONTH FROM client_files.created_at)
+                )
+                SELECT product_total, name, created_month
+                FROM ranked_data
+                WHERE rank <= 5
+                ORDER BY created_month, product_total DESC;
+        ");
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
 }
