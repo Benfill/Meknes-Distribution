@@ -39,7 +39,7 @@ export default function ConfirmAlert({ loading, open, handleClose, confirm, canc
                     {loading ? (
                         <>
                             <Button  disabled onClick={cancel}>Annuler</Button>
-                            <Button disabled onClick={confirm}>Loading... <Spinner className='w-4 ml-2 flex justify-end items-center' disabled={false} /> </Button>
+                            <Button disabled>Loading... <Spinner className='w-4 ml-2 flex justify-end items-center' disabled={false} /> </Button>
                         </>
                     ) : (
                         <>

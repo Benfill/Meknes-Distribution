@@ -19,6 +19,8 @@ import { invoke } from "@tauri-apps/api/tauri";
 import ClientFile from "../pages/ClientFile";
 import Details from "../components/Client-File/Details";
 import Create from "../components/Client-File/Create";
+import { Mails } from "../pages/Mails";
+import ProductDetails from "../components/Other/ProductDetails";
 
 export const Router = (props) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -66,6 +68,8 @@ export const Router = (props) => {
             <Route path="/stats" element={<Stats />} />
             <Route path="/settings" element={<Setting />} />
             <Route path="/spinner" element={<Spinner />} />
+            <Route path="/mails" element={<Mails />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
           </Route>
         )}
       </Routes>

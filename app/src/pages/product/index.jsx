@@ -3,6 +3,77 @@ import Table from "../../components/Other/Table";
 import Spinner from "../../components/Other/Spinner";
 import GET from "../../utils/GET";
 import { validateProduct } from "../../utils/validationFunctions";
+import { Link } from "react-router-dom";
+
+const columns = [
+  {
+    accessorKey: "id",
+    header: "Id",
+    enableEditing: false,
+  },
+  {
+    accessorKey: "designation",
+    header: "Designation",
+  },
+  {
+    accessorKey: "supplier_id",
+    header: "Fournisseur",
+  },
+  {
+    accessorKey: "sub_category_id",
+    header: "Group",
+  },
+  {
+    accessorKey: "marge_brut",
+    header: "Marge Brut",
+  },
+  {
+    accessorKey: "prix_achat",
+    header: "Prix Achat",
+  },
+  {
+    accessorKey: "prix_tarif",
+    header: "Prix Tarif",
+  },
+  {
+    accessorKey: "prix_vente",
+    header: "Prix Vente",
+  },
+  {
+    accessorKey: "prix_vente_net",
+    header: "Prix Vente Net",
+  },
+  {
+    accessorKey: "remise",
+    header: "Remise",
+  },
+  {
+    accessorKey: "TVA",
+    header: "TVA",
+  },
+  {
+    accessorKey: "reference",
+    header: "Reference",
+  },
+  {
+    accessorKey: "image",
+    header: "Image",
+    Cell: ({ cell }) => (
+      cell.value ? <img src={cell.value} alt="Product" style={{ width: '50px', height: '50px' }} /> : 'No Image'
+    ),
+  },
+  {
+    accessorKey: 'view-more',
+    header: "View More",
+    Cell: ({ row }) => (
+      <Link
+      to={`/products/${row.original.id}`}
+      >
+        View More
+      </Link>
+    ),
+  }
+];
 
 
 export const Product = () => {
@@ -29,25 +100,6 @@ export const Product = () => {
     getSuppliers();
   }, []);
 
-  const columns = [
-    { accessorKey: "id", header: "Id", enableEditing: false },
-    { accessorKey: "designation", header: "Designation" },
-    { accessorKey: "supplier_id", header: "Fournisseur"},
-    { accessorKey: "sub_category_id", header: "Group" },
-    { accessorKey: "marge_brut", header: "Marge Brut" },
-    { accessorKey: "prix_achat", header: "Prix Achat" },
-    { accessorKey: "prix_tarif", header: "Prix Tarif" },
-    { accessorKey: "prix_vente", header: "Prix Vente" },
-    { accessorKey: "prix_vente_net", header: "Prix Vente Net" },
-    { accessorKey: "remise", header: "Remise" },
-    { accessorKey: "TVA", header: "TVA" },
-    { accessorKey: "reference", header: "Reference" },
-    // { 
-    //   accessorKey: "image", 
-    //   header: "Image", 
-    //   Cell: ({ cell }) => ( cell.value ? <img src={cell.value} alt="Product" style={{ width: '50px', height: '50px' }} /> : 'No Image') 
-    // },
-  ];
 
   return loading ? (
     <Spinner /> 

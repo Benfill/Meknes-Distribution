@@ -4,49 +4,72 @@
     <meta charset="UTF-8">
     <title>Informations sur le Dossier</title>
     <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.4;
+            font-size: 10pt;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
-            width: 80%;
+            width: 100%;
+            max-width: 21cm;
             margin: auto;
-            padding: 20px;
+            padding: 0.5cm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 0.5cm;
+        }
+
+        .header h1 {
+            font-size: 14pt;
+            margin: 0;
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 0.5cm;
         }
 
         .section h2 {
+            font-size: 12pt;
             border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
+            padding-bottom: 3px;
+            margin-top: 0.3cm;
+            margin-bottom: 0.2cm;
         }
 
         .section-content {
-            margin-top: 10px;
+            margin-top: 0.2cm;
         }
 
         .label {
             font-weight: bold;
-            width: 120px;
+            width: 4cm;
             display: inline-block;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
         }
 
         .contact-info {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 0.5cm;
+            font-size: 9pt;
+            justify-self: end;
+        }
+
+        p {
+            margin: 0.1cm 0;
         }
     </style>
 </head>
@@ -61,7 +84,9 @@
         <div class="section-content">
             <p><span class="label">Nom du Fichier:</span> {{ $file->file_name }}</p>
             <p><span class="label">Surface d'Exploitation:</span> {{ $file->exploitation_surface }} m²</p>
-            <p><span class="label">Adresse Complète:</span> {{ $file->full_address }}</p>
+            <p><span
+                    class="label">Adresse Complète:</span> {{ str_contains($file->full_address, "(M)") ? str_replace('(M)', '', $file->full_address)  : $file->full_address }}
+            </p>
         </div>
     </div>
 
@@ -69,7 +94,6 @@
         <h2>Détails Supplémentaires</h2>
         <div class="section-content">
             <p><span class="label">Plus de Détails:</span> {{ $file->more_detail }}</p>
-            <p><span class="label">Est Supprimé:</span> {{ $file->is_deleted ? 'Oui' : 'Non' }}</p>
         </div>
     </div>
 

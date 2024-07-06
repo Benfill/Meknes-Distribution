@@ -148,6 +148,26 @@ class ProductController extends Controller
         ]);
     }
 
+    function show($id): \Illuminate\Http\JsonResponse
+    {
+        $product = Product::where('id', $id)
+            ->where('is_deleted', 'no')
+            ->first();
+        if ($product) {
+            $response = [
+                'status' => 'Success',
+                'product' => $product
+            ];
+        } else {
+
+            $response = [
+                'status' => 'Success',
+                'message' => "Product Isn't Found"
+            ];
+        }
+        return response()->json($response);
+    }
+
     function softDelete($id): \Illuminate\Http\JsonResponse
     {
         $validator = validator(['id' => $id], [

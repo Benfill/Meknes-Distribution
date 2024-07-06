@@ -24,6 +24,26 @@ class ClientController extends Controller
         return response()->json($response, 200);
     }
 
+    function show($id): \Illuminate\Http\JsonResponse
+    {
+        $client = Client::where('id', $id)
+            ->where('is_deleted', 'no')
+            ->first();
+        if ($client) {
+            $response = [
+                'status' => 'Success',
+                'product' => $client
+            ];
+        } else {
+
+            $response = [
+                'status' => 'Success',
+                'message' => "Client Isn't Found"
+            ];
+        }
+        return response()->json($response);
+    }
+
     function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [

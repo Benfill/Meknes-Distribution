@@ -1,4 +1,3 @@
 <div>
-    {{$title}}
     {{$body}}
 </div>
