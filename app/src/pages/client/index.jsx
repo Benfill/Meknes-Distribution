@@ -3,6 +3,7 @@ import Spinner from "../../components/Other/Spinner";
 import GET from "../../utils/GET";
 import { useEffect, useState } from "react";
 import { validateClient } from "../../utils/validationFunctions";
+import { Link } from "react-router-dom";
 
 const columns = [
   { accessorKey: 'id', header: 'Id', enableEditing: false },
@@ -16,6 +17,17 @@ const columns = [
   { accessorKey: 'role', header: 'Role Du Client', selectOptions: ["CEO", "Farm Manager", "Agronomist", "Supply Chain Manager", "Field Technician", "Sales Representative", "Marketing Director", "Research Scientist", "Quality Control Specialist", "HR Manager", "Other"]},
   { accessorKey: 'address_exploitation', header: "Address D'exploitation" },
   { accessorKey: 'address_facturation', header: 'Address De Facturation' },
+  {
+    accessorKey: 'view-more',
+    header: "View More",
+    Cell: ({ row }) => (
+      <Link
+        to={`/clients/${row.original.id}`}
+      >
+        View More
+      </Link>
+    ),
+  },
 ];
 
 

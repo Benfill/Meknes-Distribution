@@ -1,19 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 import {
   MRT_EditActionButtons,
   MaterialReactTable,
   useMaterialReactTable,
-} from 'material-react-table';
+} from "material-react-table";
 import {
   Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   Tooltip,
   MenuItem,
-  Select,
   TextField,
   Input,
 } from '@mui/material';
@@ -38,85 +33,129 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
   const [alertLoad, setAlertLoad] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const ENDPOINT = entityType.toLowerCase() === 'category' ? 'categories' : `${entityType.toLowerCase()}s`;
+  const ENDPOINT =
+    entityType.toLowerCase() === "category"
+      ? "categories"
+      : `${entityType.toLowerCase()}s`;
 
   const queryClient = useQueryClient();
+
+  const { subCategoryOptions, loading: subCategoriesLoading } = useSubSelect();
+
   const memoizedColumns = useMemo(() => {
     return columns.map((col) => {
       let muiEditTextFieldProps = undefined;
-  
-      if (col.required) {
-        muiEditTextFieldProps = {
-          required: true,
-          error: !!validationErrors[col.accessorKey],
-          helperText: validationErrors[col.accessorKey],
-          onFocus: () =>
-            setValidationErrors((prev) => ({
-              ...prev,
-              [col.accessorKey]: undefined,
-            })),
-        };
-      } else if (col.accessorKey === 'type') {
-        muiEditTextFieldProps = {
-          select: true,
-          SelectProps: {
-            displayEmpty: true,
-            renderValue: (value) => (value ? value : 'Select Type'),
-          },
-          children: [
-            <MenuItem key="Particulier" value="Particulier">Particulier</MenuItem>,
-            <MenuItem key="Entreprise" value="Entreprise">Entreprise</MenuItem>,
-          ],
-        };
-      } else if (col.accessorKey === 'role') {
-        muiEditTextFieldProps = {
-          select: true,
-          SelectProps: {
-            displayEmpty: true,
-            renderValue: (value) => (value ? value : 'Select Role'),
-          },
-          children: col.selectOptions.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          )),
-        };
-      } else if (col.accessorKey === 'supplier_id') {
-        muiEditTextFieldProps = {
-          select: true,
-          SelectProps: {
-            displayEmpty: true,
-            renderValue: (value) => (value ? value.name : 'Select Supplier'),
-          },
-          children: suppliers.map((supplier) => (
-            <MenuItem key={supplier.id} value={supplier.id}>
-              {supplier.name}
-            </MenuItem>
-          )),
-        };
-      } else if (col.accessorKey === 'sub_category_id') {
-        muiEditTextFieldProps = {
-          children: <SubSelect />,
-        };
-      } else if (col.accessorKey === 'image') {
-        muiEditTextFieldProps = {
-          children: (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleImageChange(e, table)}
-            />
-          ),
-        };
-      
-      } 
-  
+
+      const today = new Date().toISOString().split("T")[0];
+
+      switch (col.DataTypeNeeded) {
+        case "number":
+          muiEditTextFieldProps = {
+            type: "number",
+            inputProps: { min: 0 },
+          };
+          break;
+
+        case "image":
+          muiEditTextFieldProps = {
+            type: "file",
+            accept: "image/*",
+          };
+          break;
+
+        case "date":
+          muiEditTextFieldProps = {
+            type: "date",
+            InputLabelProps: {
+              shrink: true,
+            },
+            style: {
+              width: "100%",
+            },
+          };
+          break;
+
+        case "float":
+          muiEditTextFieldProps = {
+            type: "number",
+            step: "0.01",
+          };
+          break;
+
+        default:
+          break;
+      }
+
+      switch (col.accessorKey) {
+        case "required":
+          muiEditTextFieldProps = {
+            required: true,
+            error: !!validationErrors[col.accessorKey],
+            helperText: validationErrors[col.accessorKey],
+            onFocus: () =>
+              setValidationErrors((prev) => ({
+                ...prev,
+                [col.accessorKey]: undefined,
+              })),
+          };
+          break;
+
+        case "type":
+          muiEditTextFieldProps = {
+            select: true,
+            SelectProps: {
+              displayEmpty: true,
+              renderValue: (value) => (value ? value : "Select Type"),
+            },
+            children: [
+              <MenuItem key="Particulier" value="Particulier">
+                Particulier
+              </MenuItem>,
+              <MenuItem key="Entreprise" value="Entreprise">
+                Entreprise
+              </MenuItem>,
+            ],
+          };
+          break;
+
+        case "sub_category_id":
+          muiEditTextFieldProps = {
+            select: true,
+            children: subCategoriesLoading ? (
+              <MenuItem disabled>Loading...</MenuItem>
+            ) : (
+              subCategoryOptions.map((option) => (
+                <MenuItem key={option.key} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))
+            ),
+          };
+          break;
+
+        default:
+          if (col.required) {
+            muiEditTextFieldProps = {
+              required: true,
+              error: !!validationErrors[col.accessorKey],
+              helperText: validationErrors[col.accessorKey],
+              onFocus: () =>
+                setValidationErrors((prev) => ({
+                  ...prev,
+                  [col.accessorKey]: undefined,
+                })),
+            };
+          }
+          break;
+      }
+
       return {
         ...col,
         muiEditTextFieldProps,
       };
     });
-  }, [columns, validationErrors, suppliers]);
+
+  }, [columns, validationErrors, suppliers, subCategoryOptions, subCategoriesLoading]);
   
   const queryKey = `${entityType.toLowerCase()}s`;
 
@@ -124,7 +163,7 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
     mutationFn: async (values) => await POST(ENDPOINT, values),
     onSuccess: async () => {
       queryClient.invalidateQueries(queryKey);
-      toast.success('Item created successfully');
+      toast.success("Item created successfully");
       setLoading(true);
       updatedData(JSON.parse(sessionStorage.getItem(ENDPOINT)));
       setLoading(false);
@@ -135,7 +174,7 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
     mutationFn: async (values) => await PUT(ENDPOINT, values.id, values),
     onSuccess: async () => {
       queryClient.invalidateQueries(ENDPOINT);
-      toast.success('Item updated successfully');
+      toast.success("Item updated successfully");
     },
   });
 
@@ -143,7 +182,7 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
     mutationFn: async (id) => await DELETE_API(ENDPOINT, id),
     onSuccess: async () => {
       queryClient.invalidateQueries(ENDPOINT);
-      toast.success('Item deleted successfully');
+      toast.success("Item deleted successfully");
     },
   });
 
@@ -153,11 +192,35 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
   };
 
   const handleSaveEntity = async ({ values, table }) => {
+
     console.log('update click');
     await updateEntity.mutateAsync(values);
     console.log('update after request');
     table.setEditingRow(null);
+
+    try {
+      const newValidationErrors = validateEntity(values);
+      if (Object.values(newValidationErrors).some(Boolean)) {
+        setValidationErrors(newValidationErrors);
+        return;
+      }
+  
+      // Perform mutation to update entity
+      await updateEntity.mutateAsync(values);
+  
+      // Invalidate query and update data
+      queryClient.invalidateQueries(ENDPOINT);
+      toast.success("Item updated successfully");
+  
+      // Reset editing state
+      table.setEditingRow(null);
+    } catch (error) {
+      console.error("Error saving entity:", error);
+      toast.error("Failed to save item. Please try again.");
+    }
+
   };
+  
 
   const openDeleteConfirmModal = (row) => {
     setCurrentRow(row);
@@ -181,8 +244,8 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
   const table = useMaterialReactTable({
     columns: memoizedColumns,
     data,
-    createDisplayMode: 'modal',
-    editDisplayMode: 'modal',
+    createDisplayMode: "modal",
+    editDisplayMode: "modal",
     enableEditing: true,
     getRowId: (row) => row.id,
     onCreatingRowCancel: () => setValidationErrors({}),
@@ -194,6 +257,19 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
         <DialogTitle>Create New {entityType}</DialogTitle>
         <DialogContent>
           {internalEditComponents}
+
+          {/* {entityType === "User" && (
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              onChange={(e) =>
+                table.setValueForField("password", e.target.value)
+              }
+            />
+          )} */}
+
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -210,7 +286,7 @@ const Table = ({ columns, data, entityType, validateEntity, updatedData, supplie
       </>
     ),
     renderRowActions: ({ row, table }) => (
-      <Box sx={{ display: 'flex', gap: '1rem' }}>
+      <Box sx={{ display: "flex", gap: "1rem" }}>
         {loading && <Spinner />}
         <Tooltip title="Edit">
           <IconButton onClick={() => table.setEditingRow(row)}>

@@ -32,7 +32,7 @@ class ClientController extends Controller
         if ($client) {
             $response = [
                 'status' => 'Success',
-                'product' => $client
+                'client' => $client
             ];
         } else {
 

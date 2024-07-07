@@ -14,11 +14,12 @@ const columns = [
   },
   {
     accessorKey: "name",
-    header: "Fournisseur",
+    header: "Nom de Fournisseur",
   },
   {
     accessorKey: "remise_f",
     header: "Remise",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "remise_f_composition",
@@ -27,10 +28,13 @@ const columns = [
   {
     accessorKey: "date_debut",
     header: "Date de Debut",
+    DataTypeNeeded: "date",
   },
   {
     accessorKey: "date_fin",
     header: "Date de Fin",
+    DataTypeNeeded: "date",
+    nullable: true,
   },
 ];
 const Supplier = () => {

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import GET from '../../utils/GET';
 import { Image } from '@mui/icons-material';
+import DefaultAvatar from '../../assets/default_avatar.png';
+import BigTractor from '../../assets/big-tractor.jpg';
 
 
 const ProductDetails = () => {
@@ -13,9 +15,8 @@ const ProductDetails = () => {
         console.log(product);
     }, []);
     const get_products = async () => {
-        const r = await GET('products');
-        const findProduct = r.products.find((p) => p.id = id);
-        setProduct(findProduct);
+        const r = await GET(`products/${id}`);
+        setProduct(r.product);
     }
 
     const format_date = (dateString) => {
@@ -45,12 +46,12 @@ const ProductDetails = () => {
             <div className="md:flex items-start justify-center pb-12 2xl:px-20 md:px-6 px-4">
                 <div>
                     <div className="xl:w-2/6 lg:w-2/5 w-80 md:block hidden">
-                        <img className="w-full" alt="image of a girl posing" src={product?.image} /> 
+                        <img className="w-96 rounded-lg my-2" alt="image of a girl posing" src={BigTractor} /> 
                     </div>
 
                     <div className="mx-auto px-5">
                         <div className="max-w-xs cursor-pointer rounded-lg bg-white p-2 shadow duration-150 hover:scale-105 hover:shadow-md">
-                            <img className="w-full rounded-lg object-cover object-center" src='' alt="product" />
+                            <img className="w-full object-cover p-4 object-center rounded-full" src={DefaultAvatar} alt="product" />
                             <div>
                                 <div className="my-6 flex items-center justify-between px-4">
                                     <p className="font-bold text-gray-500">{product?.supplier?.name.toUpperCase()}</p> 

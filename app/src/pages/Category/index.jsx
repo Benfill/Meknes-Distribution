@@ -13,11 +13,7 @@ const columns = [
   {
     accessorKey: "name",
     header: "Category Name",
-  },
-  {
-    accessorKey: "groups",
-    header: "Groups",
-  },
+  }
 ];
 
 function Category() {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientController;
@@ -112,6 +113,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/delete', [EmailController::class, 'destroy']);
     });
 
+    Route::get('archives', [ArchiveController::class, 'index']);
+    Route::post('archives', [ArchiveController::class, 'restore']);
 });
 
 

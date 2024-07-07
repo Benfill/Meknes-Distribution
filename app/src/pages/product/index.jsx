@@ -26,30 +26,37 @@ const columns = [
   {
     accessorKey: "marge_brut",
     header: "Marge Brut",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "prix_achat",
     header: "Prix Achat",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "prix_tarif",
     header: "Prix Tarif",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "prix_vente",
     header: "Prix Vente",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "prix_vente_net",
     header: "Prix Vente Net",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "remise",
     header: "Remise",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "TVA",
     header: "TVA",
+    DataTypeNeeded: "float",
   },
   {
     accessorKey: "reference",
@@ -58,16 +65,24 @@ const columns = [
   {
     accessorKey: "image",
     header: "Image",
-    Cell: ({ cell }) => (
-      cell.value ? <img src={cell.value} alt="Product" style={{ width: '50px', height: '50px' }} /> : 'No Image'
-    ),
+    DataTypeNeeded: "image",
+    Cell: ({ cell }) =>
+      cell.value ? (
+        <img
+          src={cell.value}
+          alt="Product"
+          style={{ width: "50px", height: "50px" }}
+        />
+      ) : (
+        "No Image"
+      ),
   },
   {
     accessorKey: 'view-more',
     header: "View More",
     Cell: ({ row }) => (
       <Link
-      to={`/products/${row.original.id}`}
+        to={`/products/${row.original.id}`}
       >
         View More
       </Link>
@@ -102,11 +117,11 @@ export const Product = () => {
 
 
   return loading ? (
-    <Spinner /> 
+    <Spinner />
   ) : (
     <div className="overflow-auto ml-12 px-2 mt-10">
       <h1 className="py-10 text-center">Products Table</h1>
-     
+
       {data ? (
         <Table
           updatedData={(updatedData) => setData(updatedData.products)}

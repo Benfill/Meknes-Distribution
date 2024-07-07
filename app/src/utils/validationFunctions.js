@@ -55,7 +55,6 @@ function validateProduct(product) {
       : "",
     supplier: !validateRequired(product.supplier) ? "Supplier is required" : "",
     group: !validateRequired(product.group) ? "Group is required" : "",
-    category: !validateRequired(product.category) ? "Category is required" : "",
     marge_brut: !validateRequired(product.marge_brut)
       ? "Marge Brut is required"
       : "",
@@ -83,7 +82,6 @@ function validateSupplier(supplier) {
     name: !validateRequired(supplier.name) ? 'Supplier name is required' : '',
     remise_f: !validateRequired(supplier.remise_f) ? 'Remise is required' : '',
     remise_f_composition: !validateRequired(supplier.remise_f_composition) ? 'Remise Composition is required' : '',
-    date_fin: !validateDate(supplier.date_fin) ? 'Invalid end date' : '',
   };
 }
 
