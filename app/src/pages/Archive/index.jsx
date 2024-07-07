@@ -239,16 +239,16 @@ export const Archive = () => {
           </svg>
         </Link>
         <select
-          className="p-2 px-3 border rounded"
+          className="p-2 px-8 w-1/5 border rounded"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
-          <option value="all">All</option>
-          <option value="products">Products</option>
-          <option value="suppliers">Suppliers</option>
-          <option value="users">Users</option>
+          <option value="all">Tous</option>
+          <option value="products">Produits</option>
+          <option value="suppliers">Fournisseurs</option>
+          <option value="users">Utilisateurs</option>
           <option value="clients">Clients</option>
-          <option value="clientFiles">Client Files</option>
+          <option value="clientFiles">Dossiers Client</option>
         </select>
       </div>
       <div className="flex-1 overflow-auto p-4">
@@ -258,7 +258,7 @@ export const Archive = () => {
           </div>
         ) : (
           <p className="text-center">
-            No data available for the selected filter.
+            Aucune donnée disponible pour le filtre sélectionné.
           </p>
         )}
       </div>

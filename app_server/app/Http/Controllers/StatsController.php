@@ -113,14 +113,13 @@ class StatsController extends Controller
 
     function getTrendingCommune(): \Illuminate\Http\JsonResponse
     {
-        $trending = DB::select("
-            SELECT communes.id, communes.name, COUNT(client_files.id) AS nbr
-            FROM communes
-            INNER JOIN client_files ON communes.id = client_files.commune_id
-            GROUP BY communes.id
-             ORDER BY nbr DESC
-             LIMIT 4
-");
+        $trending = DB::table('communes')
+            ->select('communes.id', 'communes.name', DB::raw('COUNT(client_files.id) AS nbr'))
+            ->join('client_files', 'communes.id', '=', 'client_files.commune_id')
+            ->groupBy('communes.id', 'communes.name')
+            ->orderByDesc('nbr')
+            ->limit(4)
+            ->get();
 
         return response()->json([
             'status' => 'success',
@@ -130,25 +129,28 @@ class StatsController extends Controller
 
     function getProductsStats(): \Illuminate\Http\JsonResponse
     {
-        $data = DB::select("
-                WITH ranked_data AS (
-                SELECT
-                    COUNT(products.id) AS product_total,
-                    communes.name,
-                    EXTRACT(MONTH FROM client_files.created_at) AS created_month,
-                    ROW_NUMBER() OVER (PARTITION BY EXTRACT(MONTH FROM client_files.created_at) ORDER BY COUNT(products.id) DESC) AS rank
-                FROM client_file_products
-                INNER JOIN products ON client_file_products.product_id = products.id
-                INNER JOIN client_files ON client_file_products.client_file_id = client_files.id
-                INNER JOIN communes ON client_files.commune_id = communes.id
-                WHERE client_files.created_at > (CURRENT_DATE - INTERVAL '12 months')
-                GROUP BY communes.name, EXTRACT(MONTH FROM client_files.created_at)
-                )
-                SELECT product_total, name, created_month
-                FROM ranked_data
-                WHERE rank <= 5
-                ORDER BY created_month, product_total DESC;
-        ");
+        // Determine the database driver (MySQL, PostgreSQL, SQLite)
+        $driver = DB::connection()->getDriverName();
+
+        // Adjust date handling based on database driver
+        $dateSubtraction = match ($driver) {
+            'pgsql' => "current_date - interval '12 months'",
+            'mysql' => "DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH)",
+            default => "date('now', '-12 months')",
+        };
+
+        // Build the query using Laravel's query builder
+        $data = DB::table('client_file_products')
+            ->select(DB::raw('COUNT(products.id) AS product_total, communes.name, EXTRACT(MONTH FROM client_files.created_at) AS created_month'))
+            ->join('products', 'client_file_products.product_id', '=', 'products.id')
+            ->join('client_files', 'client_file_products.client_file_id', '=', 'client_files.id')
+            ->join('communes', 'client_files.commune_id', '=', 'communes.id')
+            ->whereRaw("client_files.created_at > $dateSubtraction")
+            ->groupBy('communes.name', DB::raw('EXTRACT(MONTH FROM client_files.created_at)'))
+            ->orderBy('created_month')
+            ->orderByDesc('product_total')
+            ->limit(5)
+            ->get();
 
         return response()->json([
             'status' => 'success',
